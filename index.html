@@ -59,12 +59,6 @@
             pointer-events: none;
         }
 
-        .book-canvas { perspective: 2000px; }
-        .book-model {
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.2, 0, 0.2, 1);
-        }
-
         .cta-button {
             position: relative;
             padding: 1.2rem 2.8rem;
@@ -117,7 +111,8 @@
 
     <!-- Navigation (不透明・固定) -->
     <nav class="fixed top-0 w-full z-50 px-4 py-4 md:px-10 md:py-5 flex justify-between items-center">
-        <div class="font-bold tracking-tighter text-lg md:text-xl uppercase">百人の顔</div>
+        <!-- ロゴをボタン化（トップへ戻る） -->
+        <a href="#" class="font-bold tracking-tighter text-lg md:text-xl uppercase hover:opacity-70 transition-opacity">百人の顔</a>
         <div class="hidden md:flex gap-8 text-[10px] tracking-[0.3em] uppercase opacity-80">
             <a href="#concept" class="hover:text-accent transition-colors">コンセプト</a>
             <a href="#legacy" class="hover:text-accent transition-colors">母校への寄贈</a>
@@ -188,14 +183,11 @@
                 <span class="text-unit">100冊をあなたの名で</span><span class="text-unit">直接寄贈する。</span>
             </h2>
 
-            <div class="relative max-w-4xl mx-auto mb-24 md:mb-32 book-canvas">
-                <!-- 本の3Dモデル：装丁が決まり次第、中の背景（bg-neutral-900）を画像等に変更可能 -->
-                <div class="スクリーンショット 2026-03-19 172633.png">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
-                    <div class="p-6 md:p-8 flex flex-col h-full justify-between border-l-4 border-accent/30">
-                        <div class="text-white text-left font-serif text-lg md:text-xl leading-tight uppercase">百人の顔<br><span class="text-[9px] tracking-[0.2em] opacity-50">100 Philosophies</span></div>
-                        <div class="text-accent text-[9px] tracking-widest text-left uppercase">母校寄贈プロジェクト</div>
-                    </div>
+            <!-- 画像への差し替え：本の中身の例（見開きページなど） -->
+            <div class="relative max-w-4xl mx-auto mb-24 md:mb-32">
+                <div class="reveal-img mx-auto max-w-2xl rounded-lg shadow-2xl overflow-hidden border border-black/5 bg-neutral-100">
+                    <!-- 画像差し替え：本の中身の例（見開きページや誌面サンプル画像） -->
+                    <img id="img-book-sample" src="スクリーンショット 2026-03-19 172633.png" alt="本の中身の例" class="image-placeholder w-full h-auto block">
                 </div>
                 <div class="mt-10 text-xs md:text-sm opacity-50 italic font-serif">「百人の顔」は、あなたの原点である図書室に保存されます。</div>
             </div>
@@ -203,7 +195,7 @@
             <div class="grid md:grid-cols-3 gap-10 md:gap-12 text-left">
                 <div class="space-y-4 reveal-up">
                     <div class="h-[1px] w-full bg-black/10"></div>
-                    <div class="text-accent font-bold text-[9px] uppercase">価値 01</div>
+                    <div class="text-accent font-bold text-[9px] uppercase">Value 01</div>
                     <div class="text-lg font-bold">社会的証明の可視化</div>
                     <p class="text-sm opacity-70 leading-loose">
                         <span class="text-unit">選ばれた100名としての</span><span class="text-unit">信頼を可視化。</span><span class="text-unit">採用活動やブランディングの</span><span class="text-unit">強力な資産になります。</span>
@@ -211,7 +203,7 @@
                 </div>
                 <div class="space-y-4 reveal-up" style="transition-delay: 200ms;">
                     <div class="h-[1px] w-full bg-black/10"></div>
-                    <div class="text-accent font-bold text-[9px] uppercase">価値 02</div>
+                    <div class="text-accent font-bold text-[9px] uppercase">Value 02</div>
                     <div class="text-lg font-bold">母校への教育還元</div>
                     <p class="text-sm opacity-70 leading-loose">
                         <span class="text-unit">経営者様本人の名義で寄贈。</span><span class="text-unit">かつてのあなたのように</span><span class="text-unit">夢を追う子供たちの</span><span class="text-unit">ロールモデルとなります。</span>
@@ -219,7 +211,7 @@
                 </div>
                 <div class="space-y-4 reveal-up" style="transition-delay: 400ms;">
                     <div class="h-[1px] w-full bg-black/10"></div>
-                    <div class="text-accent font-bold text-[9px] uppercase">価値 03</div>
+                    <div class="text-accent font-bold text-[9px] uppercase">Value 03</div>
                     <div class="text-lg font-bold">理念の浸透と継承</div>
                     <p class="text-sm opacity-70 leading-loose">
                         <span class="text-unit">名刺では語れない背景を。</span><span class="text-unit">社内研修やステークホルダーとの</span><span class="text-unit">深い関係構築に寄与します。</span>
@@ -272,7 +264,7 @@
                                 取材・制作スケジュールを優先的に確保いたします。社会貢献をより迅速に、そして価値高く実現します。
                             </p>
                         </div>
-                        <a href="#contact" class="w-full block py-4 bg-white text-black text-center rounded-full font-bold text-xs tracking-widest hover:bg-accent transition-colors">このプランで申し込む</a>
+                        <a href="#contact" class="w-full block py-4 bg-white text-black text-center rounded-full font-bold text-xs tracking-widest hover:bg-accent transition-colors uppercase">このプランで申し込む</a>
                     </div>
                 </div>
             </div>
@@ -286,7 +278,7 @@
         </div>
 
         <div class="container mx-auto px-6 text-center relative z-10">
-            <!-- 画像差し替え：プロフィールまたはロゴ（現在はプレースホルダー） -->
+            <!-- 画像差し替え：プロフィールまたはロゴ -->
             <div class="reveal-img mx-auto w-24 h-24 mb-10 rounded-full overflow-hidden border border-accent/30 p-1">
                 <img id="img-contact-logo" src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=400" alt="運営ロゴ" class="image-placeholder rounded-full">
             </div>
@@ -373,20 +365,6 @@
                 y: 30, opacity: 0, duration: 1, ease: "power3.out"
             });
         });
-
-        const bookModel = document.querySelector('.book-model');
-        if (bookModel) {
-            ScrollTrigger.create({
-                trigger: "#legacy",
-                start: "top center",
-                onEnter: () => gsap.to(bookModel, { rotateY: -25, duration: 2, ease: "power2.out" })
-            });
-            window.addEventListener('mousemove', (e) => {
-                const x = (e.clientX / window.innerWidth - 0.5) * 12;
-                const y = (e.clientY / window.innerHeight - 0.5) * 12;
-                gsap.to('.book-model', { rotateY: -25 + x, rotateX: -y, duration: 1, ease: "power1.out" });
-            });
-        }
     </script>
 </body>
 </html>
