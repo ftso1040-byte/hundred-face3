@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百人の顔 | 未来へ贈るメッセージ 100の人生・100の哲学</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Plus+Jakarta+Sans:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f1115;
+            --accent-color: #c9a050; /* 真鍮・ゴールド */
+            --accent-glow: rgba(201, 160, 80, 0.4);
+            --text-main: #f8f9fa;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', 'Noto Serif JP', serif;
+            overflow-x: hidden;
+            word-wrap: break-word;
+        }
+
+        /* テキスト見切れ防止用ユニット */
+        .text-unit {
+            display: inline-block;
+            white-space: nowrap;
+            vertical-align: top;
+            max-width: 100%;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        .fluid-h1 { font-size: clamp(2.2rem, 7vw, 6rem); line-height: 1.1; }
+        .fluid-h2 { font-size: clamp(1.6rem, 4.5vw, 3.5rem); line-height: 1.25; }
+        .fluid-p { font-size: clamp(0.95rem, 1.1vw, 1.2rem); line-height: 1.8; }
+
+        /* ヘッダー固定・黒背景（透過なし） */
+        nav {
+            background-color: #0f1115;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 画像差し替え：メインビジュアル（ヒーロー背景） */
+        .library-gradient {
+            background: linear-gradient(to bottom, rgba(15, 17, 21, 0.8), rgba(15, 17, 21, 1)),
+                        url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=2000') center/cover no-repeat;
+        }
+
+        .dust-particle {
+            position: absolute;
+            background: rgba(201, 160, 80, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .book-canvas { perspective: 2000px; }
+        .book-model {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.2, 0, 0.2, 1);
+        }
+
+        .cta-button {
+            position: relative;
+            padding: 1.2rem 2.8rem;
+            background: var(--accent-color);
+            color: #000;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-radius: 9999px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+            box-shadow: 0 10px 30px -5px var(--accent-glow);
+            border: 1px solid var(--accent-color);
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -5px var(--accent-glow);
+            background: #fff;
+            border-color: #fff;
+        }
+
+        .image-placeholder {
+            background-color: #1a1d23;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f1115; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Overlay -->
+    <div id="loader" class="fixed inset-0 z-[100] bg-[#0f1115] flex items-center justify-center">
+        <div class="text-center">
+            <div class="mb-4 overflow-hidden">
+                <span class="block text-accent text-sm tracking-[0.3em] translate-y-full opacity-0 loader-text italic font-serif text-accent uppercase">百人の顔 — 100 Philosophies</span>
+            </div>
+            <div class="w-48 h-[1px] bg-white/10 relative overflow-hidden">
+                <div class="absolute inset-0 bg-accent w-full -translate-x-full loader-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation (不透明・固定) -->
+    <nav class="fixed top-0 w-full z-50 px-4 py-4 md:px-10 md:py-5 flex justify-between items-center">
+        <div class="font-bold tracking-tighter text-lg md:text-xl uppercase">百人の顔</div>
+        <div class="hidden md:flex gap-8 text-[10px] tracking-[0.3em] uppercase opacity-80">
+            <a href="#concept" class="hover:text-accent transition-colors">コンセプト</a>
+            <a href="#legacy" class="hover:text-accent transition-colors">母校への寄贈</a>
+            <a href="#plan" class="hover:text-accent transition-colors">参画プラン</a>
+            <a href="#contact" class="hover:text-accent transition-colors">お問合せ</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative h-screen w-full flex items-center justify-center overflow-hidden library-gradient pt-16">
+        <div id="dust-container" class="absolute inset-0 overflow-hidden opacity-40"></div>
+        
+        <div class="container mx-auto px-6 text-center z-10">
+            <span class="text-accent text-[10px] md:text-xs tracking-[0.5em] mb-6 block opacity-80 reveal-up uppercase">未来へ贈るメッセージ | 100の人生・100の哲学</span>
+            <h1 class="fluid-h1 font-bold mb-8 tracking-tight">
+                <span class="text-unit">記憶の棚から、</span><br class="hidden md:block">
+                <span class="text-unit">未来の背表紙へ。</span>
+            </h1>
+            <p class="fluid-p opacity-60 max-w-3xl mx-auto mb-12 font-light leading-relaxed">
+                <span class="text-unit">100人の経営者の軌跡が、</span><span class="text-unit">一冊の「解」となり、</span><br>
+                <span class="text-unit">母校の図書室で、</span><span class="text-unit">一人の子供の運命を</span><span class="text-unit">変える社会的資産。</span>
+            </p>
+            <div class="flex flex-col items-center gap-4">
+                <a href="#contact" class="cta-button text-xs md:text-sm">
+                    プロジェクトに参画する
+                </a>
+                <span class="text-[9px] opacity-40 tracking-[0.4em] mt-8 animate-bounce uppercase">下へスクロール</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Concept Section -->
+    <section id="concept" class="py-24 md:py-64 relative bg-[#0f1115]">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+                <div class="reveal-img overflow-hidden rounded-lg aspect-[4/5] relative">
+                    <!-- 画像差し替え：コンセプトイメージ -->
+                    <img id="img-concept" src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=1200" alt="コンセプト画像" class="image-placeholder grayscale opacity-40 hover:grayscale-0 transition-all duration-1000 scale-110">
+                    <div class="absolute inset-0 border border-white/10 m-4 pointer-events-none"></div>
+                </div>
+                <div>
+                    <h2 class="fluid-h2 mb-10 leading-tight">
+                        <span class="text-unit text-accent italic font-serif">"社会的資産への</span><span class="text-unit text-accent italic font-serif">昇華"</span><br>
+                        <span class="text-unit">単なる成功談を、</span><br>
+                        <span class="text-unit">超える記録を。</span>
+                    </h2>
+                    <div class="space-y-6 md:space-y-8 opacity-70 leading-relaxed fluid-p font-light">
+                        <p>
+                            <span class="text-unit">経営の本質を、</span><span class="text-unit">次世代に手渡す。</span><br>
+                            <span class="text-unit">専門用語を排し、</span><span class="text-unit">小学校高学年から</span><span class="text-unit">大人まで届く言葉で</span><span class="text-unit">編纂します。</span>
+                        </p>
+                        <p>
+                            <span class="text-unit">「考え方」「選び方」</span><span class="text-unit">「失敗の乗り越え方」を中心に、</span><br>
+                            <span class="text-unit">経営者の思想を</span><span class="text-unit">未来の公共物として</span><span class="text-unit">保存する試みです。</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Legacy / Alma Mater Section -->
+    <section id="legacy" class="py-24 md:py-32 bg-white text-[#0f1115]">
+        <div class="container mx-auto px-6 text-center">
+            <span class="text-[10px] font-bold tracking-[0.4em] text-accent block mb-8 uppercase">社会貢献としての寄贈</span>
+            <h2 class="fluid-h2 font-bold mb-16">
+                <span class="text-unit">あなたの出身小学校へ、</span><br>
+                <span class="text-unit">100冊をあなたの名で</span><span class="text-unit">直接寄贈する。</span>
+            </h2>
+
+            <div class="relative max-w-4xl mx-auto mb-24 md:mb-32 book-canvas">
+                <!-- 本の3Dモデル：装丁が決まり次第、中の背景（bg-neutral-900）を画像等に変更可能 -->
+                <div class="book-model w-48 h-72 md:w-64 md:h-96 mx-auto bg-neutral-900 rounded-r-lg shadow-2xl relative overflow-hidden group">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
+                    <div class="p-6 md:p-8 flex flex-col h-full justify-between border-l-4 border-accent/30">
+                        <div class="text-white text-left font-serif text-lg md:text-xl leading-tight uppercase">百人の顔<br><span class="text-[9px] tracking-[0.2em] opacity-50">100 Philosophies</span></div>
+                        <div class="text-accent text-[9px] tracking-widest text-left uppercase">母校寄贈プロジェクト</div>
+                    </div>
+                </div>
+                <div class="mt-10 text-xs md:text-sm opacity-50 italic font-serif">「百人の顔」は、あなたの原点である図書室に保存されます。</div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-10 md:gap-12 text-left">
+                <div class="space-y-4 reveal-up">
+                    <div class="h-[1px] w-full bg-black/10"></div>
+                    <div class="text-accent font-bold text-[9px] uppercase">価値 01</div>
+                    <div class="text-lg font-bold">社会的証明の可視化</div>
+                    <p class="text-sm opacity-70 leading-loose">
+                        <span class="text-unit">選ばれた100名としての</span><span class="text-unit">信頼を可視化。</span><span class="text-unit">採用活動やブランディングの</span><span class="text-unit">強力な資産になります。</span>
+                    </p>
+                </div>
+                <div class="space-y-4 reveal-up" style="transition-delay: 200ms;">
+                    <div class="h-[1px] w-full bg-black/10"></div>
+                    <div class="text-accent font-bold text-[9px] uppercase">価値 02</div>
+                    <div class="text-lg font-bold">母校への教育還元</div>
+                    <p class="text-sm opacity-70 leading-loose">
+                        <span class="text-unit">経営者様本人の名義で寄贈。</span><span class="text-unit">かつてのあなたのように</span><span class="text-unit">夢を追う子供たちの</span><span class="text-unit">ロールモデルとなります。</span>
+                    </p>
+                </div>
+                <div class="space-y-4 reveal-up" style="transition-delay: 400ms;">
+                    <div class="h-[1px] w-full bg-black/10"></div>
+                    <div class="text-accent font-bold text-[9px] uppercase">価値 03</div>
+                    <div class="text-lg font-bold">理念の浸透と継承</div>
+                    <p class="text-sm opacity-70 leading-loose">
+                        <span class="text-unit">名刺では語れない背景を。</span><span class="text-unit">社内研修やステークホルダーとの</span><span class="text-unit">深い関係構築に寄与します。</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Plan Section -->
+    <section id="plan" class="py-24 md:py-32 bg-neutral-100 text-[#0f1115] border-t border-black/5">
+        <div class="container mx-auto px-6">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-accent font-bold tracking-[0.3em] text-[10px] mb-4 block uppercase">協賛金額について</span>
+                    <h2 class="fluid-h2 font-bold mb-6">参画のご案内</h2>
+                    <p class="fluid-p opacity-60 max-w-2xl mx-auto">
+                        <span class="text-unit">本企画における協賛は</span><span class="text-unit">単なる広告出稿ではありません。</span><br>
+                        <span class="text-unit">思想を未来へ紡ぐ</span><span class="text-unit">価値創出型の社会貢献です。</span>
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- 標準プラン -->
+                    <div class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-black/5 flex flex-col justify-between reveal-up">
+                        <div>
+                            <div class="text-[10px] opacity-40 uppercase tracking-widest mb-2 font-bold">標準プラン</div>
+                            <div class="text-3xl md:text-4xl font-bold text-black mb-6">¥600,000 <span class="text-xs opacity-40 font-normal">（税込）</span></div>
+                            <ul class="space-y-4 text-xs md:text-sm opacity-70 mb-10">
+                                <li class="flex items-start gap-2"><span>・</span>冊子への掲載（2ページ構成）</li>
+                                <li class="flex items-start gap-2"><span>・</span>プロによるインタビュー・ライティング・校正</li>
+                                <li class="flex items-start gap-2"><span>・</span>ポートレート撮影および誌面デザイン</li>
+                                <li class="flex items-start gap-2 text-black font-bold">
+                                    <span>・</span>出身小学校への掲載誌100冊寄贈（本人名義）<br>
+                                    <span class="text-[10px] opacity-60 font-normal">※寄贈先は原則として出身小学校ですが、ご希望により変更も可能です。</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="text-[10px] bg-neutral-50 p-4 rounded-lg">お支払い：20万円 × 3回（契約・取材・納品時）</div>
+                    </div>
+
+                    <!-- 一括即金払い特典 -->
+                    <div class="bg-black text-white p-8 md:p-10 rounded-2xl shadow-2xl relative overflow-hidden reveal-up" style="transition-delay: 200ms;">
+                        <div class="absolute top-0 right-0 bg-accent text-black text-[9px] font-bold px-4 py-2 uppercase tracking-widest">特 別 特 典</div>
+                        <div>
+                            <div class="text-[10px] opacity-60 uppercase tracking-widest mb-2 font-bold text-accent">一括即金払い特典</div>
+                            <div class="text-3xl md:text-4xl font-bold text-white mb-6">¥350,000 <span class="text-xs opacity-40 font-normal">（税込）</span></div>
+                            <p class="text-xs md:text-sm opacity-80 leading-loose mb-10">
+                                <span class="font-bold text-accent">契約時一括お支払いの場合</span><br>
+                                取材・制作スケジュールを優先的に確保いたします。社会貢献をより迅速に、そして価値高く実現します。
+                            </p>
+                        </div>
+                        <a href="#contact" class="w-full block py-4 bg-white text-black text-center rounded-full font-bold text-xs tracking-widest hover:bg-accent transition-colors">このプランで申し込む</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-48 md:py-64 relative bg-[#0f1115] overflow-hidden">
+        <div class="absolute inset-0 opacity-20 pointer-events-none">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] bg-accent blur-[150px] rounded-full opacity-10"></div>
+        </div>
+
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <!-- 画像差し替え：プロフィールまたはロゴ（現在はプレースホルダー） -->
+            <div class="reveal-img mx-auto w-24 h-24 mb-10 rounded-full overflow-hidden border border-accent/30 p-1">
+                <img id="img-contact-logo" src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=400" alt="運営ロゴ" class="image-placeholder rounded-full">
+            </div>
+
+            <h2 class="fluid-h2 mb-10 tracking-tight">
+                <span class="text-unit">未来を生きる子供たちへ、</span><br>
+                <span class="text-unit">あなたの哲学を贈る。</span>
+            </h2>
+            <p class="fluid-p mb-16 opacity-60 font-light">
+                <span class="text-unit">「百人の顔」プロジェクト、参画申込み。</span><br>
+                <span class="text-unit">限定100名の枠となっております。</span>
+            </p>
+
+            <a href="mailto:shiozawa@actilus.co.jp" class="cta-button">
+                プロジェクトへの参画を申し込む
+            </a>
+            
+            <div class="mt-24 grid md:grid-cols-2 gap-10 max-w-2xl mx-auto text-left opacity-50 text-[9px] tracking-[0.2em] uppercase leading-loose border-t border-white/10 pt-10">
+                <div>
+                    [ 運営事務局 ]<br>
+                    NPO法人先端医療をささえる会<br>
+                    〒104−0061 東京都中央区銀座6丁目6-1<br>
+                    銀座風月堂ビル5F
+                </div>
+                <div>
+                    [ お問い合わせ ]<br>
+                    TEL 03-3569-6700<br>
+                    Mail shiozawa@actilus.co.jp<br>
+                    担当：塩澤（070-7493-8159）
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 text-[8px] tracking-[0.4em] text-center opacity-30 uppercase font-light">
+        © 2024 百人の顔 PROJECT - NPO ADVANCED MEDICAL SUPPORT. ALL RIGHTS RESERVED.
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline();
+            tl.to('.loader-text', { y: 0, opacity: 1, duration: 1, ease: "power4.out" })
+              .to('.loader-bar', { x: 0, duration: 1.5, ease: "expo.inOut" }, "-=0.5")
+              .to('#loader', { yPercent: -100, duration: 1, ease: "expo.inOut" })
+              .from('h1 .text-unit', { y: 100, opacity: 0, duration: 1.5, stagger: 0.1, ease: "power4.out" }, "-=0.5")
+              .set('#loader', { display: 'none' });
+        });
+
+        const container = document.getElementById('dust-container');
+        if (container) {
+            for (let i = 0; i < 40; i++) {
+                const dust = document.createElement('div');
+                dust.className = 'dust-particle';
+                const size = Math.random() * 2 + 0.5;
+                dust.style.width = `${size}px`;
+                dust.style.height = `${size}px`;
+                dust.style.left = `${Math.random() * 100}%`;
+                dust.style.top = `${Math.random() * 100}%`;
+                container.appendChild(dust);
+                gsap.to(dust, {
+                    y: `+=${Math.random() * 60 - 30}`,
+                    x: `+=${Math.random() * 60 - 30}`,
+                    opacity: Math.random() * 0.4,
+                    duration: Math.random() * 6 + 4,
+                    repeat: -1, yoyo: true, ease: "sine.inOut"
+                });
+            }
+        }
+
+        gsap.utils.toArray('.reveal-img').forEach(img => {
+            gsap.from(img, {
+                scrollTrigger: { trigger: img, start: "top 80%" },
+                clipPath: "inset(100% 0 0 0)",
+                duration: 1.5, ease: "power4.out"
+            });
+        });
+
+        gsap.utils.toArray('.reveal-up').forEach(el => {
+            gsap.from(el, {
+                scrollTrigger: { trigger: el, start: "top 90%" },
+                y: 30, opacity: 0, duration: 1, ease: "power3.out"
+            });
+        });
+
+        const bookModel = document.querySelector('.book-model');
+        if (bookModel) {
+            ScrollTrigger.create({
+                trigger: "#legacy",
+                start: "top center",
+                onEnter: () => gsap.to(bookModel, { rotateY: -25, duration: 2, ease: "power2.out" })
+            });
+            window.addEventListener('mousemove', (e) => {
+                const x = (e.clientX / window.innerWidth - 0.5) * 12;
+                const y = (e.clientY / window.innerHeight - 0.5) * 12;
+                gsap.to('.book-model', { rotateY: -25 + x, rotateX: -y, duration: 1, ease: "power1.out" });
+            });
+        }
+    </script>
+</body>
+</html>
